@@ -41,7 +41,9 @@ export async function insertCustomer(req, res) {
     const {name, phone, cpf, birthday} = req.body
 
     if(!name) return res.sendStatus(400)
-    // if(birthday !== dayjs(birthday).format("YYYY:MM:DD")) return res.status(400).send("caiu aqui!")
+
+    if(birthday !== dayjs(birthday).format("YYYY-MM-DD")) return res.sendStatus(400)
+
     if(cpf.length !== 11 || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
 
     try {
@@ -68,7 +70,7 @@ export async function updateCustomer(req, res) {
 
     try {
         const cpfExist = await db.query(`
-            SELECT * FROM customers WHERE customers.cpf = $1 AND customers.id <> $2
+            SELECT * FROM customers WHERE customers.cpf = $1 AND customers.id <> $2;
         `, [cpf, id])
         if(cpfExist.rowCount !== 0) return res.status(409).send("Conflito de cpf!")
 
