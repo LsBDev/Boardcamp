@@ -28,6 +28,7 @@ export async function specificCLient(req, res) {
         const client = await db.query(`
             SELECT * FROM customers WHERE id = $1;
         `, [id])
+        if(client.rowCount === 0) return res.sendStatus(404)
         res.status(200).send(client.rows)
 
     } catch(err) {
