@@ -42,6 +42,8 @@ export async function insertCustomer(req, res) {
 
     if(!name) return res.sendStatus(400)
     // if(birthday !== dayjs(birthday).format("YYYY:MM:DD")) return res.status(400).send("caiu aqui!")
+    if(cpf.length !== 11 || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
+
     try {
         const customerExist = await db.query(`
             SELECT * FROM customers WHERE cpf = $1
@@ -49,10 +51,32 @@ export async function insertCustomer(req, res) {
         if(customerExist.rowCount !== 0) return res.status(409).send("Cliente já possui cadastro!")
 
         await db.query(`
-            INSERT INTO customers (name, phone, cpf, birthday) VALUES($1, $2, $3, $4);
+            INSERT INTO customers (name, phone, cpf, birthday) VALUES ($1, $2, $3, $4);
         `, [name, phone, cpf, birthday])
         res.sendStatus(201)
 
+    } catch(err) {
+        res.send(err.message)
+    }
+}
+
+export async function updateCustomer(req, res) {
+    const {id} = req.params
+    const {name, phone, cpf, birthday} = req.body
+
+    if(cpf.length !== 11 || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
+
+    try {
+        const cpfExist = await db.query(`
+            SELECT * FROM customers WHERE customers.cpf = $1 AND customers.id <> $2
+        `, [cpf, id])
+        if(cpfExist.rowCount !== 0) return res.status(409).send("Conflito de cpf!")
+
+        await db.query(`
+            UPDATE customers SET name = $2, phone = $3, cpf = $4, birthday = $5
+            WHERE id = $1;
+        `,[id, name, phone, cpf, birthday])
+        res.sendStatus(200)
     } catch(err) {
         res.send(err.message)
     }
