@@ -67,7 +67,8 @@ export async function updateCustomer(req, res) {
     const {id} = req.params
     const {name, phone, cpf, birthday} = req.body
 
-    if(cpf.length !== 11 || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
+    const cpfRegex = /^\d{11}$/
+    if(!cpfRegex.test(cpf) || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
 
     try {
         const cpfExist = await db.query(`
