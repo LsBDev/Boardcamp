@@ -44,7 +44,8 @@ export async function insertCustomer(req, res) {
 
     if(birthday !== dayjs(birthday).format("YYYY-MM-DD")) return res.sendStatus(400)
 
-    if(cpf.length !== 11 || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
+    const cpfRegex = /^\d{11}$/
+    if(!cpfRegex.test(cpf) || 11 < phone.length || phone.length < 10 || !name) return res.sendStatus(400)
 
     try {
         const customerExist = await db.query(`
