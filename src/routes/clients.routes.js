@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { clientsList, insertCustomer, specificCLient, updateCustomer } from "../controllers/clients.controllers.js";
+import { clientsList, insertCustomer, specificCustomer, updateCustomer } from "../controllers/clients.controllers.js";
 
 
 const clientsRouter = Router()
 
 clientsRouter.get("/customers", clientsList)
-clientsRouter.get("/customers/:id", specificCLient)
+clientsRouter.get("/customers/:id", specificCustomer)
 clientsRouter.post("/customers", insertCustomer)
 clientsRouter.put("/customers/:id", updateCustomer)
 

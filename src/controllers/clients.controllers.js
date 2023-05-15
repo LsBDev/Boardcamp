@@ -1,13 +1,5 @@
-// {
-//     id: 1,
-//     name: 'João Alfredo',
-//     phone: '21998899222',
-//     cpf: '01234567890',
-//     birthday: '1992-10-25'
-// } tabela customers
-
-import dayjs from "dayjs";
 import { db } from "../database/database.connection.js";
+import dayjs from "dayjs";
 
 
 export async function clientsList(req, res) {
@@ -22,7 +14,7 @@ export async function clientsList(req, res) {
     }
 }
 
-export async function specificCLient(req, res) {
+export async function specificCustomer(req, res) {
     const {id} = req.params
 
     try {
