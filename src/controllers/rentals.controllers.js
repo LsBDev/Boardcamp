@@ -17,7 +17,7 @@ export async function rentalsList(req, res) {
         JOIN games ON rentals."gameId" = games.id;
         `)
         console.table(tabelaAlugueis.rows)
-        const returnObject = tabelaAlugueis.map((item) => {
+        const returnObject = tabelaAlugueis.rows.map((item) => {
             const customer = {
                 id: item.client_id,
                 name: item.client_name                
