@@ -39,7 +39,7 @@ export async function rentalsList(req, res) {
                 game: game                
             }             
         })
-        res.status(200).send(tabelaAlugueis.rows)
+        res.status(200).send(returnObject)
 
     } catch (err) {
         res.send(err.message)
@@ -64,10 +64,10 @@ export async function insertRent(req, res) {
         if(games.rows[0].id != gameId || games.rows[0].stockTotal <= 0) return res.sendStatus(400)
 
         const rented = await db.query(`
-            SELECT * FROM rentals WHERE "gameId" = $1 AND "returnDate" = null;
+            SELECT * FROM rentals WHERE "gameId" = $1 AND "returnDate" IS NULL;
         `, [gameId])
 
-        if(games.rows[0].stockTotal - rented <= 0) return res.sendStatus(400)
+        if(games.rows[0].stockTotal - rented.rowCount <= 0) return res.sendStatus(400)
 
         await db.query(`
             INSERT INTO rentals(
