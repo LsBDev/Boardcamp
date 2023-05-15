@@ -26,16 +26,32 @@ export async function rentalsList(req, res) {
 
 export async function insertRent(req, res) {
     const {customerId, gameId, daysRented} = req.body
-    // daysRented: 3, // por quantos dias o cliente agendou o aluguel
-    //rentDate:  '2021-06-20'  dayjs().format("YYYY-MM-DD")     
-    // returnDate: null,          // data que o cliente devolveu o jogo (null enquanto não devolvido)
-    // originalPrice: 4500,       // preço total do aluguel em centavos (dias alugados vezes o preço por dia do jogo)
-    // delayFee: null 
 
+    if(daysRented <= 0) return res.sendStatus(400)    
+    
     try {
+        const games = await db.query(`
+        SELECT * FROM games;
+        `)
+        const priceDay = games.rows.pricePerDay
+
+        const rentDate = dayjs().format("YYYY-MM-DD")
+        const originalPrice = priceDay*daysRented
+        const returnDate = null
+        const delayFee = null
+
+        if(games.rows.id !== gameId || games.rows.stockTotal <= 0) return res.sendStatus(400)
+
         await db.query(`
-            INSERT INTO rentals("customerId", "gameId", "daysRented") VALUES ($1, $2, $3);
-        `, [customerId, gameId, daysRented])
+            INSERT INTO rentals(
+                "customerId", 
+                "gameId",
+                "rentDate",
+                "daysRented", 
+                "originalPrice", 
+                "returnDate", 
+                "delayFee") VALUES ($1, $2, $3, $4, $5, $6, $7);
+        `, [customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee])
         res.sendStatus(200)
 
     } catch (err) {
