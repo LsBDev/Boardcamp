@@ -58,3 +58,36 @@ export async function insertRent(req, res) {
         res.send(err.message)
     }
 }
+
+export async function finishedRent(req, res) {
+    const {id} = req.params
+    const today = dayjs().format("YYYY-MM-DD")
+
+    try {
+        const rentalList = await db.query(`
+            SELECT * FROM rentals WHERE rentals.id = $1;
+        `, [id])
+        if(!rentalList || rentalList.rows[0].returnDate != null) return res.sendStatus(404)
+        const rental = rentalList.rows[0]
+        const totalDays = today - rental.rentDate
+        const delayDays = totalDays - rental.daysRented
+
+        if(delayDays > 0) {
+            await db.query(`
+                UPDATE rentals
+                SET "delayFee" = $1, "returnDate" = $2
+                WHERE rentals.id = $3;
+            `,[delayDays*rental.pricePerDay, today, id])
+        } else {
+            await db.query(`
+                UPDATE rentals 
+                SET "returnDate" = $2
+                WHERE rentals.id = $1
+            `, [id, today])
+        }
+        res.sendStatus(200)        
+        
+    } catch(err) {
+        res.send(err.message)
+    }
+}
