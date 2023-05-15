@@ -52,7 +52,7 @@ export async function insertRent(req, res) {
                 "returnDate", 
                 "delayFee") VALUES ($1, $2, $3, $4, $5, $6, $7);
         `, [customerId, gameId, rentDate, daysRented, returnDate, originalPrice, delayFee])
-        res.sendStatus(200)
+        res.sendStatus(201)
 
     } catch (err) {
         res.send(err.message)
