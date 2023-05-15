@@ -56,13 +56,18 @@ export async function insertRent(req, res) {
         SELECT * FROM games WHERE games.id = $1;
         `, [gameId])
         const priceDay = games.rows[0].pricePerDay
-
         const rentDate = dayjs().format("YYYY-MM-DD")
         const originalPrice = Number(priceDay*daysRented)
         const returnDate = null
         const delayFee = null
 
-        if(games.rows[0].id != gameId || games.rows.stockTotal <= 0) return res.sendStatus(400)
+        if(games.rows[0].id != gameId || games.rows[0].stockTotal <= 0) return res.sendStatus(400)
+
+        const rented = await db.query(`
+            SELECT * FROM rentals WHERE "gameId" = $1 AND "returnDate" = null;
+        `, [gameId])
+
+        if(games.rows[0].stockTotal - rented <= 0) return res.sendStatus(400)
 
         await db.query(`
             INSERT INTO rentals(
