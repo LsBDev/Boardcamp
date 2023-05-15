@@ -67,7 +67,8 @@ export async function finishedRent(req, res) {
         const rentalList = await db.query(`
             SELECT * FROM rentals WHERE rentals.id = $1;
         `, [id])
-        if(!rentalList || rentalList.rows[0].returnDate != null) return res.sendStatus(404)
+        if(rentalList.rowCount === 0) return res.sendStatus(404)
+        if(rentalList.rows[0].returnDate != null) return res.sendStatus(400)
         const rental = rentalList.rows[0]
         const totalDays = today - rental.rentDate
         const delayDays = totalDays - rental.daysRented
@@ -99,7 +100,7 @@ export async function deleteRental(req, res) {
         const rentalList = await db.query(`
             SELECT * FROM rentals WHERE rentals.id = $1;            
         `, [id])
-        if(!rentalList) return res.sendStatus(404)
+        if(rentalList.rowCount === 0) return res.sendStatus(404)
         if(rentalList.rows[0].returnDate === null) return res.sendStatus(400)
 
         await db.query(`
