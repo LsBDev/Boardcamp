@@ -89,6 +89,7 @@ export async function insertRent(req, res) {
 export async function finishedRent(req, res) {
     const {id} = req.params
     const today = dayjs().format("YYYY-MM-DD")
+    const todayFormated = dayjs()
 
     try {
         const rentalList = await db.query(`
@@ -97,7 +98,10 @@ export async function finishedRent(req, res) {
         if(rentalList.rowCount === 0) return res.sendStatus(404)
         if(rentalList.rows[0].returnDate != null) return res.sendStatus(400)
         const rental = rentalList.rows[0]
-        const totalDays = today - rental.rentDate
+        // const todalDays = rental.rentDate - today
+        const totalDays = todayFormated.diff(dayjs(rental.rentDate), "day")
+        // console.log(totalDays)
+        // console.log(typeof(rental.rentDate))
         const delayDays = totalDays - rental.daysRented
 
         if(delayDays > 0) {
